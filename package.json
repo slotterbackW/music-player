@@ -4,17 +4,21 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "server": "parcel index.html -p 4200"
+    "server": "parcel src/index.html -p 4200"
   },
   "dependencies": {
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-redux": "^5.0.7",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0",
     "soundfont-player": "^0.10.6",
     "webmidi": "^2.0.0"
   },
   "devDependencies": {
     "babel-preset-react-app": "^3.1.1",
-    "parcel-bundler": "^1.4.1"
+    "parcel-bundler": "^1.6.2"
   },
   "author": "Will Slotterback <will2337@gmail.com>"
 }

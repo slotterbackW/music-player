@@ -1,7 +1,13 @@
-import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
-import WebMidi from 'webmidi'
+import React from 'react'
 
+const App = () => (
+    <h1>App</h1>
+)
+
+export default App
+
+/*
+import WebMidi from 'webmidi'
 import Midi from './components/Midi'
 
 class App extends Component {
@@ -75,3 +81,4 @@ ReactDOM.render(
     <App/>,
     document.getElementById('app')
 )
+*/
