@@ -47,9 +47,19 @@ class App extends Component {
     }
 
     onSetupSuccess(midiInput) {
+
         console.log('onSetupSuccess', midiInput)
         // TODO attach event listeners to midiInput
         const player = midiInput
+        
+        player.addListener('noteon', 'all', e => {
+            console.log('Received note ON message', e.note)
+        })
+
+        player.addListener('noteoff', 'all', e => {
+            console.log('Received note OFF message', e.note)
+        })
+
         this.setState({
             player: player
         })
