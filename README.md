@@ -17,6 +17,6 @@ yarn
 ```
 and then do
 ```
-yarn run server
+yarn start
 ```
-to start a local development server
+to start the app

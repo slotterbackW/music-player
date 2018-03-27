@@ -4,15 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "server": "parcel src/index.html -p 4200"
+    "start": "parcel src/index.html -p 4200"
   },
   "dependencies": {
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-redux": "^5.0.7",
-    "redux": "^3.7.2",
-    "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.2.0",
     "soundfont-player": "^0.10.6",
     "webmidi": "^2.0.0"
   },
