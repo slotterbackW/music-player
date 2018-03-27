@@ -12,12 +12,16 @@ class App extends Component {
             showSetupModal: false,
             initializeError: null,
             midiInputs: null,
-            player: null
+            player: null,
+            currentSong: null,
+            savedSongs: []
         }
 
         this.setupPlayer = this.setupPlayer.bind(this)
         this.onCloseModal = this.onCloseModal.bind(this)
         this.onSetupSuccess = this.onSetupSuccess.bind(this)
+        this.noteOn = this.noteOn.bind(this)
+        this.noteOff = this.noteOff.bind(this)
     }
 
     setupPlayer() {
@@ -46,14 +50,35 @@ class App extends Component {
         })
     }
 
-    onSetupSuccess(midiInput) {
+    /*
+        Note structure:
+        {
+            name: 'C',
+            number: 60,
+            octave: 3
+        }
+    */
 
+    noteOn(note) {
+        console.log('Received note ON message', note)
+        // TODO send note on message
+        // Add to current song state
+    }
+
+    noteOff(note) {
+        console.log('Received note OFF message', note)
+        // TODO send note off message
+        // Add to current song state
+    }
+
+    onSetupSuccess(midiInput) {
         console.log('onSetupSuccess', midiInput)
-        // TODO attach event listeners to midiInput
+        
         const player = midiInput
         
+        // TODO attach event listeners to midiInput
         player.addListener('noteon', 'all', e => {
-            console.log('Received note ON message', e.note)
+            this.noteOn(e.note)
         })
 
         player.addListener('noteoff', 'all', e => {
