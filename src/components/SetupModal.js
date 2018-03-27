@@ -1,12 +1,16 @@
 import React from 'react'
 
 const SetupModal = ({ error, midiInputs, onSetupSuccess, onClose }) => {
+
     const errorMessage = error ? <p className="red">{error}</p> : null
     
     const inputs = midiInputs && midiInputs.length > 0 ?
         <ul>
             {midiInputs.map((midiInput, index) => (
-                <li onClick={() => onSetupSuccess(midiInput)} key={index} className="input">
+                <li onClick={() => { onSetupSuccess(midiInput); onClose() }}
+                    key={index}
+                    className="input"
+                >
                     {midiInput.name}
                 </li>    
             ))}
