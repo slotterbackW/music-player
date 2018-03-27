@@ -1,8 +1,13 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
 import WebMidi from 'webmidi'
+import Soundfont from 'soundfont-player'
 
 import SetupModal from './components/SetupModal'
+
+import Instruments from './models/Instruments'
+
+const ac = new AudioContext()
 
 class App extends Component {
     constructor(props) {
@@ -13,6 +18,7 @@ class App extends Component {
             initializeError: null,
             midiInputs: null,
             player: null,
+            instrument: null,
             currentSong: null,
             savedSongs: []
         }
@@ -20,6 +26,7 @@ class App extends Component {
         this.setupPlayer = this.setupPlayer.bind(this)
         this.onCloseModal = this.onCloseModal.bind(this)
         this.onSetupSuccess = this.onSetupSuccess.bind(this)
+        this.changeInstrument = this.changeInstrument.bind(this)
         this.noteOn = this.noteOn.bind(this)
         this.noteOff = this.noteOff.bind(this)
     }
@@ -37,8 +44,8 @@ class App extends Component {
                 this.setState({
                     midiInputs: WebMidi.inputs,
                     showSetupModal: true,
-                    
                 })
+                this.changeInstrument('acoustic_grand_piano')
             }
         })
         console.log('If nothing shows up Midi has already been enabled. Just refresh the page')
@@ -48,6 +55,18 @@ class App extends Component {
         this.setState({
             showSetupModal: false
         })
+    }
+
+    changeInstrument(instrumentName) {
+        if (instrumentName in Instruments) {
+            Soundfont.instrument(ac, instrumentName).then(instrument =>
+                this.setState({
+                    instrument: instrument
+                })
+            )
+        } else {
+            throw `Instrument ${instrumentName} not recognized.`
+        }
     }
 
     /*
@@ -60,8 +79,11 @@ class App extends Component {
     */
 
     noteOn(note) {
-        console.log('Received note ON message', note)
+        
         // TODO send note on message
+        const { instrument } = this.state
+
+        instrument.play(note.number)
         // Add to current song state
     }
 
@@ -78,11 +100,13 @@ class App extends Component {
         
         // TODO attach event listeners to midiInput
         player.addListener('noteon', 'all', e => {
+            console.log('Received note ON message', e)
             this.noteOn(e.note)
         })
 
         player.addListener('noteoff', 'all', e => {
-            console.log('Received note OFF message', e.note)
+            console.log('Received note OFF message', e)
+            this.noteOff(e.note)
         })
 
         this.setState({
