@@ -3,7 +3,8 @@ import { render } from "react-dom";
 import WebMidi from "webmidi";
 import Soundfont from "soundfont-player";
 
-import SetupModal from "./components/SetupModal";
+import SetupMIDIModal from "./components/SetupMIDIModal";
+import SetupKeyboard from "./components/SetupKeyboard";
 
 import Instruments from "./models/Instruments";
 import { notesToSchedule } from "./models/Song";
@@ -31,7 +32,7 @@ class App extends Component {
     };
 
     this.toggleMIDISetupModal = this.toggleMIDISetupModal.bind(this);
-    this.onCloseModal = this.onCloseModal.bind(this);
+    this.toggleKeyboardModal = this.toggleKeyboardModal.bind(this);
     this.setMIDIinput = this.setMIDIinput.bind(this);
     this.toggleRecording = this.toggleRecording.bind(this);
     this.changeInstrument = this.changeInstrument.bind(this);
@@ -70,9 +71,9 @@ class App extends Component {
     });
   }
 
-  onCloseModal() {
+  toggleKeyboardModal() {
     this.setState({
-      showMIDISetupModal: false
+      showKeyboardSetup: !this.state.showKeyboardSetup
     });
   }
 
@@ -168,14 +169,16 @@ class App extends Component {
       <div>
         {error}
         <button onClick={this.toggleMIDISetupModal}>Setup MIDI Device</button>
-        <button onClick={this.setupKeyboard}>Setup Keyboard</button>
+        <button onClick={this.toggleKeyboardModal}>Setup Keyboard</button>
         {showMIDISetupModal && (
-          <SetupModal
+          <SetupMIDIModal
             setMIDIinput={this.setMIDIinput}
-            onClose={this.onCloseModal}
+            onClose={this.toggleMIDISetupModal}
           />
         )}
-        {showKeyboardSetup && <div />}
+        {showKeyboardSetup && (
+          <SetupKeyboard onClose={this.toggleKeyboardModal} />
+        )}
       </div>
     );
 

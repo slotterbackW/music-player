@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import WebMidi from "webmidi";
 
-class SetupModal extends Component {
+class SetupMIDIModal extends Component {
   constructor(props) {
     super(props);
 
@@ -67,4 +67,4 @@ class SetupModal extends Component {
   }
 }
 
-export default SetupModal;
+export default SetupMIDIModal;
