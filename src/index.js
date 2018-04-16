@@ -10,8 +10,6 @@ import Instruments from "./models/Instruments";
 import { notesToSchedule } from "./models/Song";
 import { addToTmp, completeNote } from "./models/TempNotes";
 
-const ac = new AudioContext();
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -31,6 +29,7 @@ class App extends Component {
       savedSongs: []
     };
 
+    this.enableWebMidi = this.enableWebMidi.bind(this);
     this.toggleMIDISetupModal = this.toggleMIDISetupModal.bind(this);
     this.toggleKeyboardModal = this.toggleKeyboardModal.bind(this);
     this.setMIDIinput = this.setMIDIinput.bind(this);
@@ -42,8 +41,13 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.enableWebMidi();
+    this.changeInstrument("acoustic_grand_piano");
+  }
+
+  enableWebMidi() {
     if (WebMidi.enabled === true) {
-      console.log("Midi is enabled");
+      console.log("Midi already enabled");
       this.setState({
         midiLoading: false
       });
@@ -81,8 +85,6 @@ class App extends Component {
     this.setState({
       midiInput: midiInput
     });
-
-    this.changeInstrument("acoustic_grand_piano");
   }
 
   toggleRecording() {
@@ -93,10 +95,12 @@ class App extends Component {
 
   changeInstrument(instrumentName) {
     if (instrumentName in Instruments) {
-      Soundfont.instrument(ac, instrumentName).then(instrument =>
-        this.setState({
-          instrument: instrument
-        })
+      Soundfont.instrument(new AudioContext(), instrumentName).then(
+        instrument => {
+          this.setState({
+            instrument: instrument
+          });
+        }
       );
     } else {
       throw `Instrument ${instrumentName} not recognized.`;
@@ -106,7 +110,7 @@ class App extends Component {
   playSong() {
     const { currentSong, instrument } = this.state;
 
-    const currentTime = ac.currentTime + 0.2;
+    const ac = new AudioContext();
 
     Object.keys(currentSong.notes).map(instrument => {
       Soundfont.instrument(ac, `${instrument}`).then(sfInstrument =>
@@ -127,26 +131,34 @@ class App extends Component {
       }
   */
 
-  noteOn(note) {
+  noteOn(noteEvent) {
     const { instrument, recording } = this.state;
 
     // TODO have note play for correct amount of time
-    instrument.play(note.number);
+    instrument.play(noteEvent.note.number);
 
-    if (recording) {
-      addToTmp(note);
-      console.log("Note added to tmpNotes: ", note);
+    if (recording === true) {
+      addToTmp(noteEvent);
+      console.log("Note Event added to tmpNotes: ", noteEvent);
     }
   }
 
-  noteOff(note) {
-    const { instrument, recording } = this.state;
+  noteOff(noteEvent) {
+    const { instrument, recording, currentSong } = this.state;
 
-    console.log("Received note OFF message", note);
-    if (recording) {
+    if (recording === true) {
+      const note = completeNote(noteEvent);
+
+      const existingNotes = currentSong.notes[`${instrument.name}`];
+      const newNotes = existingNotes ? [...existingNotes, note] : [note];
+
       this.setState(
         {
-          currentSong: currentSong.notes[instrument].push(completeNote(note))
+          currentSong: Object.assign({}, currentSong, {
+            notes: {
+              [`${instrument.name}`]: newNotes
+            }
+          })
         },
         () => console.log("Current song updated: ", this.state.currentSong)
       );
@@ -170,9 +182,13 @@ class App extends Component {
         {error}
         <button onClick={this.toggleMIDISetupModal}>Setup MIDI Device</button>
         <button onClick={this.toggleKeyboardModal}>Setup Keyboard</button>
+        <button onClick={this.toggleRecording}>Toggle Recording</button>
+        <button onClick={this.playSong}>Play Current Song</button>
         {showMIDISetupModal && (
           <SetupMIDIModal
             setMIDIinput={this.setMIDIinput}
+            noteOn={this.noteOn}
+            noteOff={this.noteOff}
             onClose={this.toggleMIDISetupModal}
           />
         )}

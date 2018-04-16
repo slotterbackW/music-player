@@ -6,24 +6,32 @@
 
 const tmpNotes = {};
 
-export const addToTmp = note => {
-  tmpNotes[`${note.number}-${note.octave}`] = note;
+export const addToTmp = noteEvent => {
+  console.log("Add to tmp called");
+  tmpNotes[`${noteEvent.note.number}-${noteEvent.note.octave}`] = noteEvent;
 };
 
-export const completeNote = noteOff => {
-  const noteOn = tmpNotes[`${note.number}-${note.octave}`];
-  console.log("Note on retrieved from tmpNotes", noteOn);
+export const completeNote = noteEvent => {
+  const noteOnEvent =
+    tmpNotes[`${noteEvent.note.number}-${noteEvent.note.octave}`];
+
+  if (noteOnEvent === undefined) {
+    console.log("No noteOn event found", noteEvent);
+    return;
+  }
+
+  console.log("Note on retrieved from tmpNotes", noteOnEvent);
 
   const newNote = {
-    name: note.name,
-    number: note.number,
-    octave: note.octave,
-    onTimestamp: noteOn.timestamp, // TODO is this the correct reference?
-    offTimestamp: note.timestamp // TODO ^
+    name: noteEvent.note.name,
+    number: noteEvent.note.number,
+    octave: noteEvent.note.octave,
+    onTimestamp: noteOnEvent.timestamp,
+    offTimestamp: noteEvent.timestamp
   };
   console.log("New complete note generated", newNote);
 
-  delete tmpNotes[`${note.number}-${note.octave}`];
+  delete tmpNotes[`${noteEvent.note.number}-${noteEvent.note.octave}`];
 
   return newNote;
 };
