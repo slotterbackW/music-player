@@ -108,6 +108,7 @@ class App extends Component {
   }
 
   playSong() {
+    // TODO debug
     const { currentSong, instrument } = this.state;
 
     const ac = new AudioContext();
@@ -115,8 +116,8 @@ class App extends Component {
     Object.keys(currentSong.notes).map(instrument => {
       Soundfont.instrument(ac, `${instrument}`).then(sfInstrument =>
         sfInstrument.schedule(
-          currentTime,
-          notesToSchedule(currentTime.notes[`${instrument}`])
+          ac.currentTime + 0.2,
+          notesToSchedule(currentSong.notes[`${instrument}`])
         )
       );
     });
