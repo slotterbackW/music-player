@@ -1,140 +1,186 @@
-import React, { Component } from 'react'
-import { render } from 'react-dom'
-import WebMidi from 'webmidi'
-import Soundfont from 'soundfont-player'
+import React, { Component } from "react";
+import { render } from "react-dom";
+import WebMidi from "webmidi";
+import Soundfont from "soundfont-player";
 
-import SetupModal from './components/SetupModal'
+import SetupModal from "./components/SetupModal";
 
-import Instruments from './models/Instruments'
+import Instruments from "./models/Instruments";
+import { notesToSchedule } from "./models/Song";
+import { addToTmp, completeNote } from "./models/TempNotes";
 
-const ac = new AudioContext()
+const ac = new AudioContext();
 
 class App extends Component {
-    constructor(props) {
-        super(props)
+  constructor(props) {
+    super(props);
 
-        this.state = {
-            showSetupModal: false,
-            initializeError: null,
-            midiInputs: null,
-            player: null,
-            instrument: null,
-            currentSong: null,
-            savedSongs: []
-        }
+    this.state = {
+      showMIDISetupModal: false,
+      showKeyboardSetup: false,
+      midiLoading: true,
+      midiError: null,
+      midiInput: null,
+      instrument: null,
+      recording: false,
+      currentSong: {
+        name: "Track 1",
+        notes: {}
+      },
+      savedSongs: []
+    };
 
-        this.setupPlayer = this.setupPlayer.bind(this)
-        this.onCloseModal = this.onCloseModal.bind(this)
-        this.onSetupSuccess = this.onSetupSuccess.bind(this)
-        this.changeInstrument = this.changeInstrument.bind(this)
-        this.noteOn = this.noteOn.bind(this)
-        this.noteOff = this.noteOff.bind(this)
-    }
+    this.toggleMIDISetupModal = this.toggleMIDISetupModal.bind(this);
+    this.onCloseModal = this.onCloseModal.bind(this);
+    this.setMIDIinput = this.setMIDIinput.bind(this);
+    this.toggleRecording = this.toggleRecording.bind(this);
+    this.changeInstrument = this.changeInstrument.bind(this);
+    this.playSong = this.playSong.bind(this);
+    this.noteOn = this.noteOn.bind(this);
+    this.noteOff = this.noteOff.bind(this);
+  }
 
-    setupPlayer() {
-        WebMidi.enable(err => {
-            if(err) {
-                console.log("WebMidi could not be started", err)
-                this.setState({
-                    initializeError: err,
-                    showSetupModal: true
-                })
-            } else {
-                console.log("WebMidi successfully started", WebMidi)
-                this.setState({
-                    midiInputs: WebMidi.inputs,
-                    showSetupModal: true,
-                })
-                this.changeInstrument('acoustic_grand_piano')
-            }
-        })
-        console.log('If nothing shows up Midi has already been enabled. Just refresh the page')
-    }
-
-    onCloseModal() {
-        this.setState({
-            showSetupModal: false
-        })
-    }
-
-    changeInstrument(instrumentName) {
-        if (instrumentName in Instruments) {
-            Soundfont.instrument(ac, instrumentName).then(instrument =>
-                this.setState({
-                    instrument: instrument
-                })
-            )
+  componentDidMount() {
+    if (WebMidi.enabled === true) {
+      console.log("Midi is enabled");
+      this.setState({
+        midiLoading: false
+      });
+    } else {
+      WebMidi.enable(err => {
+        if (err) {
+          console.log("WebMidi could not be started", err);
+          this.setState({
+            midiLoading: false,
+            midiError: err
+          });
         } else {
-            throw `Instrument ${instrumentName} not recognized.`
+          console.log("WebMidi successfully started", WebMidi);
+          this.setState({
+            midiLoading: false
+          });
         }
+      });
     }
+  }
 
-    /*
-        Note structure:
-        {
-            name: 'C',
-            number: 60,
-            octave: 3
-        }
-    */
+  toggleMIDISetupModal() {
+    this.setState({
+      showMIDISetupModal: !this.state.showMIDISetupModal
+    });
+  }
 
-    noteOn(note) {
-        
-        // TODO send note on message
-        const { instrument } = this.state
+  onCloseModal() {
+    this.setState({
+      showMIDISetupModal: false
+    });
+  }
 
-        instrument.play(note.number)
-        // Add to current song state
-    }
+  setMIDIinput(midiInput) {
+    this.setState({
+      midiInput: midiInput
+    });
 
-    noteOff(note) {
-        console.log('Received note OFF message', note)
-        // TODO send note off message
-        // Add to current song state
-    }
+    this.changeInstrument("acoustic_grand_piano");
+  }
 
-    onSetupSuccess(midiInput) {
-        console.log('onSetupSuccess', midiInput)
-        
-        const player = midiInput
-        
-        // TODO attach event listeners to midiInput
-        player.addListener('noteon', 'all', e => {
-            console.log('Received note ON message', e)
-            this.noteOn(e.note)
-        })
+  toggleRecording() {
+    this.setState({
+      recording: !this.state.recording
+    });
+  }
 
-        player.addListener('noteoff', 'all', e => {
-            console.log('Received note OFF message', e)
-            this.noteOff(e.note)
-        })
-
+  changeInstrument(instrumentName) {
+    if (instrumentName in Instruments) {
+      Soundfont.instrument(ac, instrumentName).then(instrument =>
         this.setState({
-            player: player
+          instrument: instrument
         })
+      );
+    } else {
+      throw `Instrument ${instrumentName} not recognized.`;
     }
+  }
 
-    render() {
-        const { initializeError, midiInputs, showSetupModal } = this.state
+  playSong() {
+    const { currentSong, instrument } = this.state;
 
-        return(
-            <div>
-                <button onClick={this.setupPlayer}>Setup MIDI Device</button>
-                {showSetupModal &&
-                    <SetupModal
-                        error={initializeError}
-                        midiInputs={midiInputs}
-                        onSetupSuccess={this.onSetupSuccess}
-                        onClose={this.onCloseModal}
-                    />
-                }
-            </div>
+    const currentTime = ac.currentTime + 0.2;
+
+    Object.keys(currentSong.notes).map(instrument => {
+      Soundfont.instrument(ac, `${instrument}`).then(sfInstrument =>
+        sfInstrument.schedule(
+          currentTime,
+          notesToSchedule(currentTime.notes[`${instrument}`])
         )
+      );
+    });
+  }
+
+  /*
+      Note structure:
+      {
+          name: 'C',
+          number: 60,
+          octave: 3
+      }
+  */
+
+  noteOn(note) {
+    const { instrument, recording } = this.state;
+
+    // TODO have note play for correct amount of time
+    instrument.play(note.number);
+
+    if (recording) {
+      addToTmp(note);
+      console.log("Note added to tmpNotes: ", note);
     }
+  }
+
+  noteOff(note) {
+    const { instrument, recording } = this.state;
+
+    console.log("Received note OFF message", note);
+    if (recording) {
+      this.setState(
+        {
+          currentSong: currentSong.notes[instrument].push(completeNote(note))
+        },
+        () => console.log("Current song updated: ", this.state.currentSong)
+      );
+    }
+  }
+
+  render() {
+    const {
+      midiLoading,
+      midiError,
+      showMIDISetupModal,
+      showKeyboardSetup
+    } = this.state;
+
+    const error = midiError ? <p>{midiError}</p> : null;
+
+    const body = midiLoading ? (
+      <h1>Loading</h1>
+    ) : (
+      <div>
+        {error}
+        <button onClick={this.toggleMIDISetupModal}>Setup MIDI Device</button>
+        <button onClick={this.setupKeyboard}>Setup Keyboard</button>
+        {showMIDISetupModal && (
+          <SetupModal
+            setMIDIinput={this.setMIDIinput}
+            onClose={this.onCloseModal}
+          />
+        )}
+        {showKeyboardSetup && <div />}
+      </div>
+    );
+
+    return body;
+  }
 }
 
-render(
-    <App />,
-    document.getElementById('root')
-)
-   
+render(<App />, document.getElementById("root"));
