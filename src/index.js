@@ -5,10 +5,13 @@ import Soundfont from "soundfont-player";
 
 import SetupMIDIModal from "./components/SetupMIDIModal";
 import SetupKeyboard from "./components/SetupKeyboard";
+import InstrumentSelector from "./components/InstrumentSelector";
 
 import InstrumentList from "./models/Instruments";
 import { notesToSchedule } from "./models/Song";
 import { addToTmp, completeNote } from "./models/TempNotes";
+
+import styles from "./index.css";
 
 class App extends Component {
   constructor(props) {
@@ -17,6 +20,7 @@ class App extends Component {
     this.state = {
       showMIDISetupModal: false,
       showKeyboardSetup: false,
+      showInstrumentSelector: false,
       midiLoading: true,
       midiError: null,
       midiInput: null,
@@ -33,6 +37,7 @@ class App extends Component {
     this.enableWebMidi = this.enableWebMidi.bind(this);
     this.toggleMIDISetupModal = this.toggleMIDISetupModal.bind(this);
     this.toggleKeyboardModal = this.toggleKeyboardModal.bind(this);
+    this.toggleInstrumentSelector = this.toggleInstrumentSelector.bind(this);
     this.setMIDIinput = this.setMIDIinput.bind(this);
     this.toggleRecording = this.toggleRecording.bind(this);
     this.changeInstrument = this.changeInstrument.bind(this);
@@ -79,6 +84,12 @@ class App extends Component {
   toggleKeyboardModal() {
     this.setState({
       showKeyboardSetup: !this.state.showKeyboardSetup
+    });
+  }
+
+  toggleInstrumentSelector() {
+    this.setState({
+      showInstrumentSelector: !this.state.showInstrumentSelector
     });
   }
 
@@ -177,7 +188,8 @@ class App extends Component {
       midiLoading,
       midiError,
       showMIDISetupModal,
-      showKeyboardSetup
+      showKeyboardSetup,
+      showInstrumentSelector
     } = this.state;
 
     const error = midiError ? <p>{midiError}</p> : null;
@@ -189,6 +201,9 @@ class App extends Component {
         {error}
         <button onClick={this.toggleMIDISetupModal}>Setup MIDI Device</button>
         <button onClick={this.toggleKeyboardModal}>Setup Keyboard</button>
+        <button onClick={this.toggleInstrumentSelector}>
+          Change Instrument
+        </button>
         <button onClick={this.toggleRecording}>Toggle Recording</button>
         <button onClick={this.playSong}>Play Current Song</button>
         {showMIDISetupModal && (
@@ -201,6 +216,12 @@ class App extends Component {
         )}
         {showKeyboardSetup && (
           <SetupKeyboard onClose={this.toggleKeyboardModal} />
+        )}
+        {showInstrumentSelector && (
+          <InstrumentSelector
+            onClose={this.toggleInstrumentSelector}
+            onChange={this.changeInstrument}
+          />
         )}
       </div>
     );
