@@ -174,6 +174,7 @@ class App extends Component {
         {
           currentSong: Object.assign({}, currentSong, {
             notes: {
+              ...currentSong.notes,
               [`${instrument.name}`]: newNotes
             }
           })
