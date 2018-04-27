@@ -15,8 +15,13 @@
   }
 */
 
-export const notesToSchedule = notes =>
-  notes.map(note => ({
-    time: note.onTimestamp,
-    note: note.number
-  }));
+export const notesToSchedule = notes => {
+  if (notes && notes.length > 0) {
+    const startTime = notes[0].onTimestamp;
+    return notes.map(note => ({
+      time: (note.onTimestamp - startTime) / 1000,
+      note: note.number
+    }));
+  }
+  return [];
+};

@@ -6,7 +6,7 @@ import Soundfont from "soundfont-player";
 import SetupMIDIModal from "./components/SetupMIDIModal";
 import SetupKeyboard from "./components/SetupKeyboard";
 
-import Instruments from "./models/Instruments";
+import InstrumentList from "./models/Instruments";
 import { notesToSchedule } from "./models/Song";
 import { addToTmp, completeNote } from "./models/TempNotes";
 
@@ -21,6 +21,7 @@ class App extends Component {
       midiError: null,
       midiInput: null,
       instrument: null,
+      loadedInstruments: {},
       recording: false,
       currentSong: {
         name: "Track 1",
@@ -94,32 +95,37 @@ class App extends Component {
   }
 
   changeInstrument(instrumentName) {
-    if (instrumentName in Instruments) {
-      Soundfont.instrument(new AudioContext(), instrumentName).then(
-        instrument => {
-          this.setState({
-            instrument: instrument
-          });
-        }
-      );
+    const { loadedInstruments } = this.state;
+    if (instrumentName in InstrumentList) {
+      if (instrumentName in loadedInstruments) {
+        return this.state.loadedInstruments[instrumentName];
+      } else {
+        Soundfont.instrument(new AudioContext(), instrumentName).then(
+          instrument => {
+            this.setState({
+              instrument,
+              loadedInstruments: {
+                ...this.state.loadedInstruments,
+                [`${instrumentName}`]: instrument
+              }
+            });
+          }
+        );
+      }
     } else {
       throw `Instrument ${instrumentName} not recognized.`;
     }
   }
 
   playSong() {
-    // TODO debug
-    const { currentSong, instrument } = this.state;
+    const { currentSong, loadedInstruments } = this.state;
 
     const ac = new AudioContext();
 
-    Object.keys(currentSong.notes).map(instrument => {
-      Soundfont.instrument(ac, `${instrument}`).then(sfInstrument =>
-        sfInstrument.schedule(
-          ac.currentTime + 0.2,
-          notesToSchedule(currentSong.notes[`${instrument}`])
-        )
-      );
+    Object.keys(currentSong.notes).map(instrumentName => {
+      const instrument = loadedInstruments[instrumentName];
+      const notes = notesToSchedule(currentSong.notes[instrumentName]);
+      instrument.schedule(ac.currentTime, notes);
     });
   }
 
