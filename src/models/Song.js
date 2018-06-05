@@ -20,8 +20,9 @@ export const notesToSchedule = notes => {
   if (notes && notes.length > 0) {
     const startTime = notes[0].onTimestamp;
     return notes.map(note => ({
+      note: note.number,
       time: (note.onTimestamp - startTime) / 1000,
-      note: note.number
+      duration: (note.offTimestamp - note.onTimestamp) / 1000
     }));
   }
   return [];

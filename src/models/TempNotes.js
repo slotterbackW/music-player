@@ -1,37 +1,44 @@
-/* Note pipeline:
-    on noteOn: add note to hash using "note.number" + "-" + "note.octave" as a key
-    on noteOff: find note in hash using same key, and combine the two notes,
-    invalidate the key, and then add the completed note to `currentSong`
-  */
+/*
+    Note Pipeline:
 
-const tmpNotes = {};
+    on noteOn:
+      add note + sound to hash using "note.number" + "-" + "note.octave" as key.
 
-export const addToTmp = noteEvent => {
-  console.log("Add to tmp called");
-  tmpNotes[`${noteEvent.note.number}-${noteEvent.note.octave}`] = noteEvent;
+    on noteOff:
+      Find note in hash using same key, stop the sound, and combine both the
+      noteOff, and noteOn event into one note. Then invalidate the key, and add
+      the completed note to the `currentSong`
+*/
+
+const TEMP_NOTES = {};
+
+export const startNote = (noteEvent, sound) => {
+  const noteWithSound = Object.assign({}, noteEvent, { sound });
+  TEMP_NOTES[
+    `${noteEvent.note.number}-${noteEvent.note.octave}`
+  ] = noteWithSound;
 };
 
 export const completeNote = noteEvent => {
-  const noteOnEvent =
-    tmpNotes[`${noteEvent.note.number}-${noteEvent.note.octave}`];
+  const storedNote =
+    TEMP_NOTES[`${noteEvent.note.number}-${noteEvent.note.octave}`];
 
-  if (noteOnEvent === undefined) {
+  if (storedNote === undefined) {
     console.log("No noteOn event found", noteEvent);
     return;
   }
 
-  console.log("Note on retrieved from tmpNotes", noteOnEvent);
+  storedNote.sound.stop();
 
   const newNote = {
-    name: noteEvent.note.name,
-    number: noteEvent.note.number,
-    octave: noteEvent.note.octave,
-    onTimestamp: noteOnEvent.timestamp,
-    offTimestamp: noteEvent.timestamp
+    name: storedNote.note.name,
+    number: storedNote.note.number,
+    octave: storedNote.note.octave,
+    onTimestamp: storedNote.timestamp,
+    offTimestamp: storedNote.timestamp
   };
-  console.log("New complete note generated", newNote);
 
-  delete tmpNotes[`${noteEvent.note.number}-${noteEvent.note.octave}`];
+  delete TEMP_NOTES[`${noteEvent.note.number}-${noteEvent.note.octave}`];
 
   return newNote;
 };

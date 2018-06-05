@@ -10,7 +10,7 @@ import InstrumentSelector from "./components/InstrumentSelector";
 
 import InstrumentList from "./models/Instruments";
 import { notesToSchedule } from "./models/Song";
-import { addToTmp, completeNote } from "./models/TempNotes";
+import { startNote, completeNote } from "./models/TempNotes";
 
 import styles from "./index.css";
 
@@ -110,7 +110,9 @@ class App extends Component {
     const { loadedInstruments } = this.state;
     if (instrumentName in InstrumentList) {
       if (instrumentName in loadedInstruments) {
-        return this.state.loadedInstruments[instrumentName];
+        this.setState({
+          instrument: this.state.loadedInstruments[instrumentName]
+        });
       } else {
         Soundfont.instrument(new AudioContext(), instrumentName).then(
           instrument => {
@@ -151,23 +153,15 @@ class App extends Component {
   */
 
   noteOn(noteEvent) {
-    const { instrument, recording } = this.state;
-
-    // TODO have note play for correct amount of time
-    instrument.play(noteEvent.note.number);
-
-    if (recording === true) {
-      addToTmp(noteEvent);
-      console.log("Note Event added to tmpNotes: ", noteEvent);
-    }
+    const sound = this.state.instrument.play(noteEvent.note.number);
+    startNote(noteEvent, sound);
   }
 
   noteOff(noteEvent) {
     const { instrument, recording, currentSong } = this.state;
+    const note = completeNote(noteEvent);
 
     if (recording === true) {
-      const note = completeNote(noteEvent);
-
       const existingNotes = currentSong.notes[`${instrument.name}`];
       const newNotes = existingNotes ? [...existingNotes, note] : [note];
 
