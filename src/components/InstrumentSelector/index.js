@@ -24,19 +24,23 @@ class InstrumentSelector extends Component {
     const { query } = this.state;
 
     return (
-      <div className="dialog">
-        <div className="dialog-header">
+      <div className="modal dialog">
+        <div>
+          <div className="title-container">
+            <h2>Change Instrument</h2>
+            <button onClick={onClose}>X</button>
+          </div>
           <form>
             <input
               className="search-input"
               ref={input => (this.search = input)}
               onChange={this.handleInputChange}
+              placeholder="Search..."
             />
           </form>
-          <button onClick={onClose}>X</button>
         </div>
         <div className="dialog-body">
-          <ul className="instrument-list">
+          <ul className="list">
             {Object.entries(InstrumentList)
               .filter(instrument => instrument[0].includes(query))
               .map((instrument, index) => (
@@ -46,7 +50,7 @@ class InstrumentSelector extends Component {
                     onClose();
                   }}
                   key={instrument[1]}
-                  className="instrument-item"
+                  className="list-item"
                 >
                   {instrument[0]}
                 </li>

@@ -1,20 +1,10 @@
+.title-container {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
 .search-input {
   display: flex;
   width: 250px;
-}
-
-.instrument-list {
-  max-height: 400px;
-  overflow-y: auto;
-  list-style: none;
-  padding: 0;
-}
-
-.instrument-item {
-  margin: 5px;
-}
-
-.instrument-item:hover {
-  cursor: pointer;
-  text-decoration: underline;
 }

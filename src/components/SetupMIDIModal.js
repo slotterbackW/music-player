@@ -38,7 +38,7 @@ class SetupMIDIModal extends Component {
 
     const inputs =
       midiInputs && midiInputs.length > 0 ? (
-        <ul>
+        <ul className="list">
           {midiInputs.map((midiInput, index) => (
             <li
               onClick={() => {
@@ -46,7 +46,7 @@ class SetupMIDIModal extends Component {
                 onClose();
               }}
               key={index}
-              className="input"
+              className="list-item"
             >
               {midiInput.name}
             </li>
@@ -57,11 +57,11 @@ class SetupMIDIModal extends Component {
       );
 
     return (
-      <div className="setup-modal flex w-center">
+      <div className="modal dialog">
         <button onClick={onClose}>Close</button>
         {errorMessage}
         <h2>Set up MIDI Device</h2>
-        <div className="midi-inputs">{inputs}</div>
+        {inputs}
       </div>
     );
   }

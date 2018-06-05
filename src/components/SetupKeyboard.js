@@ -9,9 +9,10 @@ class SetupKeyboard extends Component {
     const { onClose } = this.props;
 
     return (
-      <div>
+      <div className="modal dialog">
         <button onClick={onClose}>Close</button>
-        <h4>Keyboard modal in progress</h4>
+        <h2>Set up Keyboard</h2>
+        <p>in progress...</p>
       </div>
     );
   }

@@ -7,6 +7,25 @@
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
-.dialog-header {
-  display: flex;
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.list {
+  max-height: 400px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+}
+
+.list-item {
+  margin: 5px;
+}
+
+.list-item:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }

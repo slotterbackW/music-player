@@ -3,6 +3,7 @@ import { render } from "react-dom";
 import WebMidi from "webmidi";
 import Soundfont from "soundfont-player";
 
+import Song from "./components/Song";
 import SetupMIDIModal from "./components/SetupMIDIModal";
 import SetupKeyboard from "./components/SetupKeyboard";
 import InstrumentSelector from "./components/InstrumentSelector";
@@ -186,6 +187,7 @@ class App extends Component {
 
   render() {
     const {
+      currentSong,
       midiLoading,
       midiError,
       showMIDISetupModal,
@@ -224,6 +226,7 @@ class App extends Component {
             onChange={this.changeInstrument}
           />
         )}
+        <Song song={currentSong} />
       </div>
     );
 
