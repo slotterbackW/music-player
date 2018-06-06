@@ -17,12 +17,10 @@ class SetupMIDIModal extends Component {
     console.log("setup MIDI Device", midiDevice);
 
     midiDevice.addListener("noteon", "all", e => {
-      console.log("Received note ON message", e);
       noteOn(e);
     });
 
     midiDevice.addListener("noteoff", "all", e => {
-      console.log("Received note OFF message", e);
       noteOff(e);
     });
 

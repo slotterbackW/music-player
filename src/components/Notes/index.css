@@ -1,0 +1,10 @@
+.notes {
+  position: relative;
+  border: 1px solid gray;
+  height: 300px;
+  max-height: 300px;
+  width: 700px;
+  max-width: 700px;
+  padding: 5px;
+  overflow: scroll;
+}

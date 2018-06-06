@@ -24,7 +24,7 @@ export const completeNote = noteEvent => {
     TEMP_NOTES[`${noteEvent.note.number}-${noteEvent.note.octave}`];
 
   if (storedNote === undefined) {
-    console.log("No noteOn event found", noteEvent);
+    console.log('No noteOn event found', noteEvent);
     return;
   }
 
@@ -35,7 +35,7 @@ export const completeNote = noteEvent => {
     number: storedNote.note.number,
     octave: storedNote.note.octave,
     onTimestamp: storedNote.timestamp,
-    offTimestamp: storedNote.timestamp
+    offTimestamp: noteEvent.timestamp
   };
 
   delete TEMP_NOTES[`${noteEvent.note.number}-${noteEvent.note.octave}`];

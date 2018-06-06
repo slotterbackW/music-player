@@ -1,18 +1,18 @@
-import React, { Component } from "react";
-import { render } from "react-dom";
-import WebMidi from "webmidi";
-import Soundfont from "soundfont-player";
+import React, { Component } from 'react';
+import { render } from 'react-dom';
+import WebMidi from 'webmidi';
+import Soundfont from 'soundfont-player';
 
-import Song from "./components/Song";
-import SetupMIDIModal from "./components/SetupMIDIModal";
-import SetupKeyboard from "./components/SetupKeyboard";
-import InstrumentSelector from "./components/InstrumentSelector";
+import Song from './components/Song';
+import SetupMIDIModal from './components/SetupMIDIModal';
+import SetupKeyboard from './components/SetupKeyboard';
+import InstrumentSelector from './components/InstrumentSelector';
 
-import InstrumentList from "./models/Instruments";
-import { notesToSchedule } from "./models/Song";
-import { startNote, completeNote } from "./models/TempNotes";
+import InstrumentList from './models/Instruments';
+import { notesToSchedule } from './models/Song';
+import { startNote, completeNote } from './models/TempNotes';
 
-import styles from "./index.css";
+import styles from './index.css';
 
 class App extends Component {
   constructor(props) {
@@ -29,7 +29,7 @@ class App extends Component {
       loadedInstruments: {},
       recording: false,
       currentSong: {
-        name: "Track 1",
+        name: 'Track 1',
         notes: {}
       },
       savedSongs: []
@@ -49,25 +49,25 @@ class App extends Component {
 
   componentDidMount() {
     this.enableWebMidi();
-    this.changeInstrument("acoustic_grand_piano");
+    this.changeInstrument('acoustic_grand_piano');
   }
 
   enableWebMidi() {
     if (WebMidi.enabled === true) {
-      console.log("Midi already enabled");
+      console.log('Midi already enabled');
       this.setState({
         midiLoading: false
       });
     } else {
       WebMidi.enable(err => {
         if (err) {
-          console.log("WebMidi could not be started", err);
+          console.log('WebMidi could not be started', err);
           this.setState({
             midiLoading: false,
             midiError: err
           });
         } else {
-          console.log("WebMidi successfully started", WebMidi);
+          console.log('WebMidi successfully started', WebMidi);
           this.setState({
             midiLoading: false
           });
@@ -153,13 +153,18 @@ class App extends Component {
   */
 
   noteOn(noteEvent) {
+    console.log('Note on event', noteEvent);
     const sound = this.state.instrument.play(noteEvent.note.number);
     startNote(noteEvent, sound);
   }
 
   noteOff(noteEvent) {
+    console.log('Note off event', noteEvent);
     const { instrument, recording, currentSong } = this.state;
     const note = completeNote(noteEvent);
+    if (!note) {
+      return;
+    }
 
     if (recording === true) {
       const existingNotes = currentSong.notes[`${instrument.name}`];
@@ -174,7 +179,7 @@ class App extends Component {
             }
           })
         },
-        () => console.log("Current song updated: ", this.state.currentSong)
+        () => console.log('Current song updated: ', this.state.currentSong)
       );
     }
   }
@@ -228,4 +233,4 @@ class App extends Component {
   }
 }
 
-render(<App />, document.getElementById("root"));
+render(<App />, document.getElementById('root'));

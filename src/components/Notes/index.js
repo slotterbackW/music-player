@@ -1,4 +1,6 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
+import Note from '../Note';
+import styles from './index.css';
 
 class Notes extends Component {
   constructor(props) {
@@ -9,15 +11,16 @@ class Notes extends Component {
     const { instrument, notes } = this.props;
 
     return (
-      <div className="notes">
+      <div>
         <h4>{instrument}</h4>
-        <ul>
+        <div className="notes">
           {notes.map(note => (
-            <span key={`${note.name}${note.number}${note.onTimestamp}`}>{`${
-              note.name
-            }${note.number} `}</span>
+            <Note
+              key={`${note.name}${note.number}${note.onTimestamp}`}
+              note={note}
+            />
           ))}
-        </ul>
+        </div>
       </div>
     );
   }

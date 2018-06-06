@@ -1,5 +1,6 @@
-import React, { Component } from "react";
-import Notes from "../Notes";
+import React, { Component } from 'react';
+import Notes from '../Notes';
+import styles from './index.css';
 
 class Song extends Component {
   constructor(props) {
@@ -10,17 +11,15 @@ class Song extends Component {
     const { song } = this.props;
 
     return (
-      <div className="song-container">
+      <div className="song">
         <h1>{song.name}</h1>
-        <ul>
-          {Object.keys(song.notes).map(instrument => (
-            <Notes
-              key={instrument}
-              instrument={instrument}
-              notes={song.notes[instrument]}
-            />
-          ))}
-        </ul>
+        {Object.keys(song.notes).map(instrument => (
+          <Notes
+            key={instrument}
+            instrument={instrument}
+            notes={song.notes[instrument]}
+          />
+        ))}
       </div>
     );
   }
