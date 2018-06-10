@@ -27,3 +27,21 @@ export const notesToSchedule = notes => {
   }
   return [];
 };
+
+export const BLOCK_LENGTH = 6000;
+/* Turns an array of notes into an array of blocks split based on timestamps */
+export const notesToBlocks = notes => {
+  if (notes && notes.length > 0) {
+    let blocks = {};
+    notes.map(note => {
+      const blockIndex = Math.floor(note.offTimestamp / BLOCK_LENGTH);
+      if (!blocks[blockIndex]) {
+        blocks[`${blockIndex}`] = [note];
+      } else {
+        blocks[`${blockIndex}`].push(note);
+      }
+    });
+    return blocks;
+  }
+  return [];
+};

@@ -27,6 +27,7 @@ class App extends Component {
       midiInput: null,
       instrument: null,
       loadedInstruments: {},
+      time: null,
       recording: false,
       currentSong: {
         name: 'Track 1',
@@ -101,8 +102,10 @@ class App extends Component {
   }
 
   toggleRecording() {
+    console.log('Recording changed to', !this.state.recording);
     this.setState({
-      recording: !this.state.recording
+      recording: !this.state.recording,
+      time: new Date()
     });
   }
 
@@ -153,15 +156,19 @@ class App extends Component {
   */
 
   noteOn(noteEvent) {
-    console.log('Note on event', noteEvent);
+    const timestamp = new Date() - this.state.time;
+    const nEvent = Object.assign({}, noteEvent, { timestamp });
+    console.log('Note on event', nEvent);
     const sound = this.state.instrument.play(noteEvent.note.number);
-    startNote(noteEvent, sound);
+    startNote(nEvent, sound);
   }
 
   noteOff(noteEvent) {
-    console.log('Note off event', noteEvent);
     const { instrument, recording, currentSong } = this.state;
-    const note = completeNote(noteEvent);
+    const timestamp = new Date() - this.state.time;
+    const nEvent = Object.assign({}, noteEvent, { timestamp });
+    console.log('Note off event', nEvent);
+    const note = completeNote(nEvent);
     if (!note) {
       return;
     }

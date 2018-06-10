@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Notes from '../Notes';
+import Blocks from '../Blocks';
 import styles from './index.css';
 
 class Song extends Component {
@@ -14,7 +14,7 @@ class Song extends Component {
       <div className="song">
         <h1>{song.name}</h1>
         {Object.keys(song.notes).map(instrument => (
-          <Notes
+          <Blocks
             key={instrument}
             instrument={instrument}
             notes={song.notes[instrument]}
