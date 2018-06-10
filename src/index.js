@@ -19,7 +19,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      showMIDISetupModal: false,
+      showMIDISetupModal: true,
       showKeyboardSetup: false,
       showInstrumentSelector: false,
       midiLoading: true,
