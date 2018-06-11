@@ -1,0 +1,16 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.5rem 0.875rem;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #ebebeb;
+  font-family: 'Arimo', sans-serif;
+  font-weight: bold;
+}
+
+.button-icon {
+  width: 14px;
+  height: 14px;
+}

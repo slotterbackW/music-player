@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 import WebMidi from 'webmidi';
 import Soundfont from 'soundfont-player';
 
+import Button from './components/Button';
 import Song from './components/Song';
 import SetupMIDIModal from './components/SetupMIDIModal';
 import SetupKeyboard from './components/SetupKeyboard';
@@ -208,13 +209,17 @@ class App extends Component {
     ) : (
       <div>
         {error}
-        <button onClick={this.toggleMIDISetupModal}>Setup MIDI Device</button>
-        <button onClick={this.toggleKeyboardModal}>Setup Keyboard</button>
-        <button onClick={this.toggleInstrumentSelector}>
-          Change Instrument
-        </button>
-        <button onClick={this.toggleRecording}>Toggle Recording</button>
-        <button onClick={this.playSong}>Play Current Song</button>
+        <Button
+          title={'Setup MIDI Device'}
+          onClick={this.toggleMIDISetupModal}
+        />
+        <Button title={'Setup Keyboard'} onClick={this.toggleKeyboardModal} />
+        <Button
+          title={'Change Instrument'}
+          onClick={this.toggleInstrumentSelector}
+        />
+        <Button title={'Toggle Recording'} onClick={this.toggleRecording} />
+        <Button title={'Play Current Song'} onClick={this.playSong} />
         {showMIDISetupModal && (
           <SetupMIDIModal
             setMIDIinput={this.setMIDIinput}
