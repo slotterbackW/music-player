@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Blocks from '../Blocks';
+import SongControls from '../SongControls';
 import styles from './index.css';
 
 class Song extends Component {
@@ -8,11 +9,15 @@ class Song extends Component {
   }
 
   render() {
-    const { song } = this.props;
+    const { song, playSong, toggleRecording } = this.props;
 
     return (
       <div className="song">
-        <h1>{song.name}</h1>
+        <SongControls
+          title={song.name}
+          playSong={playSong}
+          toggleRecording={toggleRecording}
+        />
         {Object.keys(song.notes).map(instrument => (
           <Blocks
             key={instrument}

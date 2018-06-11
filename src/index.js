@@ -239,8 +239,6 @@ class App extends Component {
           onClick={this.toggleMIDISetupModal}
         />
         <Button title={'Setup Keyboard'} onClick={this.toggleKeyboardModal} />
-        <Button title={'Toggle Recording'} onClick={this.toggleRecording} />
-        <Button title={'Play Current Song'} onClick={this.playSong} />
         {showMIDISetupModal && (
           <SetupMIDIModal
             setMIDIinput={this.setMIDIinput}
@@ -258,7 +256,11 @@ class App extends Component {
             onChange={this.changeInstrument}
           />
         )}
-        <Song song={currentSong} />
+        <Song
+          song={currentSong}
+          playSong={this.playSong}
+          toggleRecording={this.toggleRecording}
+        />
         <AddInstrumentButton onClick={this.toggleInstrumentSelector} />
       </div>
     );
