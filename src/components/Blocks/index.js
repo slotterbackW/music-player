@@ -15,13 +15,17 @@ class Blocks extends Component {
     return (
       <div className="blocks">
         <h4>{instrument}</h4>
-        {Object.keys(blocks).map(blockIndex => (
-          <Block
-            key={blockIndex}
-            index={blockIndex}
-            notes={blocks[blockIndex]}
-          />
-        ))}
+        {blocks.length > 0 ? (
+          Object.keys(blocks).map(blockIndex => (
+            <Block
+              key={blockIndex}
+              index={blockIndex}
+              notes={blocks[blockIndex]}
+            />
+          ))
+        ) : (
+          <Block key={0} index={0} notes={[]} />
+        )}
       </div>
     );
   }

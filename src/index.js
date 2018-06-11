@@ -5,6 +5,7 @@ import Soundfont from 'soundfont-player';
 
 import Button from './components/Button';
 import Song from './components/Song';
+import AddInstrumentButton from './components/AddInstrumentButton';
 import SetupMIDIModal from './components/SetupMIDIModal';
 import SetupKeyboard from './components/SetupKeyboard';
 import InstrumentSelector from './components/InstrumentSelector';
@@ -32,7 +33,9 @@ class App extends Component {
       recording: false,
       currentSong: {
         name: 'Track 1',
-        notes: {}
+        notes: {
+          acoustic_grand_piano: []
+        }
       },
       savedSongs: []
     };
@@ -43,6 +46,8 @@ class App extends Component {
     this.toggleInstrumentSelector = this.toggleInstrumentSelector.bind(this);
     this.setMIDIinput = this.setMIDIinput.bind(this);
     this.toggleRecording = this.toggleRecording.bind(this);
+    this.addInstrumentToSong = this.addInstrumentToSong.bind(this);
+    this.songHasInstrument = this.songHasInstrument.bind(this);
     this.changeInstrument = this.changeInstrument.bind(this);
     this.playSong = this.playSong.bind(this);
     this.noteOn = this.noteOn.bind(this);
@@ -110,9 +115,29 @@ class App extends Component {
     });
   }
 
+  songHasInstrument(instrumentName) {
+    return Object.keys(this.state.currentSong.notes).includes(instrumentName);
+  }
+
+  addInstrumentToSong(instrumentName) {
+    const { currentSong } = this.state;
+    this.setState({
+      currentSong: Object.assign({}, currentSong, {
+        notes: {
+          ...currentSong.notes,
+          [`${instrumentName}`]: []
+        }
+      })
+    });
+  }
+
   changeInstrument(instrumentName) {
     const { loadedInstruments } = this.state;
     if (instrumentName in InstrumentList) {
+      if (!this.songHasInstrument(instrumentName)) {
+        this.addInstrumentToSong(instrumentName);
+      }
+
       if (instrumentName in loadedInstruments) {
         this.setState({
           instrument: this.state.loadedInstruments[instrumentName]
@@ -214,10 +239,6 @@ class App extends Component {
           onClick={this.toggleMIDISetupModal}
         />
         <Button title={'Setup Keyboard'} onClick={this.toggleKeyboardModal} />
-        <Button
-          title={'Change Instrument'}
-          onClick={this.toggleInstrumentSelector}
-        />
         <Button title={'Toggle Recording'} onClick={this.toggleRecording} />
         <Button title={'Play Current Song'} onClick={this.playSong} />
         {showMIDISetupModal && (
@@ -238,6 +259,7 @@ class App extends Component {
           />
         )}
         <Song song={currentSong} />
+        <AddInstrumentButton onClick={this.toggleInstrumentSelector} />
       </div>
     );
 

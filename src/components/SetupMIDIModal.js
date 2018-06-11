@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import WebMidi from "webmidi";
+import React, { Component } from 'react';
+import WebMidi from 'webmidi';
 
 class SetupMIDIModal extends Component {
   constructor(props) {
@@ -14,13 +14,13 @@ class SetupMIDIModal extends Component {
 
   setupMidiDevice(midiDevice) {
     const { noteOn, noteOff, setMIDIinput } = this.props;
-    console.log("setup MIDI Device", midiDevice);
+    console.log('setup MIDI Device', midiDevice);
 
-    midiDevice.addListener("noteon", "all", e => {
+    midiDevice.addListener('noteon', 'all', e => {
       noteOn(e);
     });
 
-    midiDevice.addListener("noteoff", "all", e => {
+    midiDevice.addListener('noteoff', 'all', e => {
       noteOff(e);
     });
 
@@ -51,7 +51,7 @@ class SetupMIDIModal extends Component {
           ))}
         </ul>
       ) : (
-        <p>No MIDI input detected.</p>
+        <p>No MIDI devices detected.</p>
       );
 
     return (
