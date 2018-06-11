@@ -1,15 +1,35 @@
 import React, { Component } from 'react';
-import Blocks from '../Blocks';
+import InstrumentBlocks from '../InstrumentBlocks';
 import SongControls from '../SongControls';
 import styles from './index.css';
 
 class Song extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      activeBlock: {
+        instrument: 'acoustic_grand_piano',
+        index: 0
+      }
+    };
+
+    this.changeActiveBlock = this.changeActiveBlock.bind(this);
+  }
+
+  changeActiveBlock(instrument, index) {
+    console.log('Change active block called', instrument, parseInt(index));
+    this.setState({
+      activeBlock: {
+        instrument,
+        index: parseInt(index)
+      }
+    });
   }
 
   render() {
     const { song, playSong, toggleRecording } = this.props;
+    const { activeBlock } = this.state;
 
     return (
       <div className="song">
@@ -18,13 +38,20 @@ class Song extends Component {
           playSong={playSong}
           toggleRecording={toggleRecording}
         />
-        {Object.keys(song.notes).map(instrument => (
-          <Blocks
-            key={instrument}
-            instrument={instrument}
-            notes={song.notes[instrument]}
-          />
-        ))}
+        {Object.keys(song.notes).map(instrument => {
+          const changeBlockWithInstrument = blockIndex =>
+            this.changeActiveBlock(instrument, blockIndex);
+
+          return (
+            <InstrumentBlocks
+              key={instrument}
+              instrument={instrument}
+              notes={song.notes[instrument]}
+              activeBlock={activeBlock}
+              changeActiveBlock={changeBlockWithInstrument.bind(this)}
+            />
+          );
+        })}
       </div>
     );
   }
