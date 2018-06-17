@@ -17,21 +17,24 @@ class InstrumentBlocks extends Component {
     const blocksLength = Object.keys(blocks).length;
 
     if (blocksLength <= 0) {
-      const onBlockClick = () => changeActiveBlock(0);
-
-      if (instrument === activeBlock.instrument && activeBlock.index === 0) {
-        return <ActiveBlock index={0} notes={[]} />;
+      if (activeBlock.index !== 0 || activeBlock.instrument !== instrument) {
+        changeActiveBlock(0);
       }
-
-      return <Block key={0} index={0} notes={[]} onClick={onBlockClick} />;
+      return <ActiveBlock index={0} notes={[]} />;
     }
 
     return Object.keys(blocks).map(blockIndex => {
       if (
         instrument === activeBlock.instrument &&
-        blockIndex === activeBlock.index
+        parseInt(blockIndex) === activeBlock.index
       ) {
-        return <ActiveBlock index={blockIndex} notes={blocks[blockIndex]} />;
+        return (
+          <ActiveBlock
+            key={blockIndex}
+            index={blockIndex}
+            notes={blocks[blockIndex]}
+          />
+        );
       }
 
       const onBlockClick = () => changeActiveBlock(blockIndex);
