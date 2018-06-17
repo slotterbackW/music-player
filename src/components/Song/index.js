@@ -28,7 +28,7 @@ class Song extends Component {
   }
 
   render() {
-    const { song, playSong, toggleRecording } = this.props;
+    const { song, playNotes, playSong, toggleRecording } = this.props;
     const { activeBlock } = this.state;
 
     return (
@@ -42,12 +42,15 @@ class Song extends Component {
           const changeBlockWithInstrument = blockIndex =>
             this.changeActiveBlock(instrument, blockIndex);
 
+          const playNotesWithInstrument = notes => playNotes(instrument, notes);
+
           return (
             <InstrumentBlocks
               key={instrument}
               instrument={instrument}
               notes={song.notes[instrument]}
               activeBlock={activeBlock}
+              playNotes={playNotesWithInstrument}
               changeActiveBlock={changeBlockWithInstrument.bind(this)}
             />
           );

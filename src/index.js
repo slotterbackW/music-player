@@ -50,13 +50,17 @@ class App extends Component {
     this.songHasInstrument = this.songHasInstrument.bind(this);
     this.changeInstrument = this.changeInstrument.bind(this);
     this.playSong = this.playSong.bind(this);
+    this.playNotes = this.playNotes.bind(this);
     this.noteOn = this.noteOn.bind(this);
     this.noteOff = this.noteOff.bind(this);
   }
 
   componentDidMount() {
     this.enableWebMidi();
-    this.changeInstrument('acoustic_grand_piano');
+    this.loadInstrument('acoustic_grand_piano').then(instrument => {
+      console.log(`${instrument.name} successfully loaded`);
+      this.setInstrument(instrument);
+    });
   }
 
   enableWebMidi() {
@@ -131,44 +135,53 @@ class App extends Component {
     });
   }
 
+  setInstrument(instrument) {
+    this.setState({
+      instrument,
+      loadedInstruments: {
+        ...this.state.loadedInstruments,
+        [`${instrument.name}`]: instrument
+      }
+    });
+  }
+
+  loadInstrument(instrumentName) {
+    const { loadedInstruments } = this.state;
+    if (Object.keys(loadedInstruments).includes(instrumentName)) {
+      return Promise.resolve(loadedInstruments[instrumentName]);
+    }
+    return Soundfont.instrument(new AudioContext(), instrumentName);
+  }
+
   changeInstrument(instrumentName) {
     const { loadedInstruments } = this.state;
     if (instrumentName in InstrumentList) {
-      if (!this.songHasInstrument(instrumentName)) {
-        this.addInstrumentToSong(instrumentName);
-      }
-
-      if (instrumentName in loadedInstruments) {
+      if (this.songHasInstrument(instrumentName)) {
         this.setState({
           instrument: this.state.loadedInstruments[instrumentName]
         });
       } else {
-        Soundfont.instrument(new AudioContext(), instrumentName).then(
-          instrument => {
-            this.setState({
-              instrument,
-              loadedInstruments: {
-                ...this.state.loadedInstruments,
-                [`${instrumentName}`]: instrument
-              }
-            });
-          }
-        );
+        this.loadInstrument(instrumentName).then(instrument => {
+          this.setInstrument(instrument);
+          this.addInstrumentToSong(instrumentName);
+        });
       }
     } else {
       throw `Instrument ${instrumentName} not recognized.`;
     }
   }
 
+  playNotes(instrumentName, notes) {
+    const instrument = this.state.loadedInstruments[instrumentName];
+    const schedule = notesToSchedule(notes);
+    instrument.schedule(0, schedule);
+  }
+
   playSong() {
-    const { currentSong, loadedInstruments } = this.state;
+    const { currentSong } = this.state;
 
-    const ac = new AudioContext();
-
-    Object.keys(currentSong.notes).map(instrumentName => {
-      const instrument = loadedInstruments[instrumentName];
-      const notes = notesToSchedule(currentSong.notes[instrumentName]);
-      instrument.schedule(ac.currentTime, notes);
+    Object.keys(currentSong.notes).forEach(instrumentName => {
+      this.playNotes(instrumentName, currentSong.notes[instrumentName]);
     });
   }
 
@@ -260,6 +273,7 @@ class App extends Component {
           song={currentSong}
           playSong={this.playSong}
           toggleRecording={this.toggleRecording}
+          playNotes={this.playNotes}
         />
         <AddInstrumentButton onClick={this.toggleInstrumentSelector} />
       </div>

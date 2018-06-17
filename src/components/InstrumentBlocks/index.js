@@ -11,28 +11,33 @@ class InstrumentBlocks extends Component {
     this.renderBlocks = this.renderBlocks.bind(this);
   }
 
-  renderBlocks() {
-    const { instrument, notes, activeBlock, changeActiveBlock } = this.props;
-    const blocks = notesToBlocks(notes);
-    const blocksLength = Object.keys(blocks).length;
+  isActiveBlock(blockIndex) {
+    const { instrument, activeBlock } = this.props;
 
-    if (blocksLength <= 0) {
-      if (activeBlock.index !== 0 || activeBlock.instrument !== instrument) {
-        changeActiveBlock(0);
-      }
+    return (
+      instrument === activeBlock.instrument &&
+      parseInt(blockIndex) === activeBlock.index
+    );
+  }
+
+  renderBlocks() {
+    const { changeActiveBlock, notes, playNotes } = this.props;
+    const blocks = notesToBlocks(notes);
+    const blockIndexes = Object.keys(blocks);
+
+    if (blockIndexes.length <= 0) {
       return <ActiveBlock index={0} notes={[]} />;
     }
 
-    return Object.keys(blocks).map(blockIndex => {
-      if (
-        instrument === activeBlock.instrument &&
-        parseInt(blockIndex) === activeBlock.index
-      ) {
+    return blockIndexes.map(blockIndex => {
+      const blockNotes = blocks[blockIndex];
+      if (this.isActiveBlock(blockIndex)) {
         return (
           <ActiveBlock
             key={blockIndex}
             index={blockIndex}
-            notes={blocks[blockIndex]}
+            notes={blockNotes}
+            playNotes={playNotes}
           />
         );
       }
@@ -43,7 +48,7 @@ class InstrumentBlocks extends Component {
         <Block
           key={blockIndex}
           index={blockIndex}
-          notes={blocks[blockIndex]}
+          notes={blockNotes}
           onClick={onBlockClick}
         />
       );

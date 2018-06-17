@@ -8,16 +8,19 @@ class ActiveBlock extends Component {
   }
 
   render() {
-    const { notes, index } = this.props;
+    const { notes, index, playNotes } = this.props;
     return (
-      <div className="block active-block">
-        {notes.map(note => (
-          <Note
-            key={`${note.number}-${note.octave}-${note.onTimestamp}`}
-            note={note}
-            blockIndex={index}
-          />
-        ))}
+      <div>
+        <button onClick={() => playNotes(notes)}>Play Notes</button>
+        <div className="block active-block">
+          {notes.map(note => (
+            <Note
+              key={`${note.number}-${note.octave}-${note.onTimestamp}`}
+              note={note}
+              blockIndex={index}
+            />
+          ))}
+        </div>
       </div>
     );
   }
