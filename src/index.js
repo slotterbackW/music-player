@@ -47,8 +47,10 @@ class App extends Component {
     this.setMIDIinput = this.setMIDIinput.bind(this);
     this.toggleRecording = this.toggleRecording.bind(this);
     this.addInstrumentToSong = this.addInstrumentToSong.bind(this);
+    this.deleteInstrumentFromSong = this.deleteInstrumentFromSong.bind(this);
     this.songHasInstrument = this.songHasInstrument.bind(this);
     this.changeInstrument = this.changeInstrument.bind(this);
+    this.loadAndSetInstrument = this.loadAndSetInstrument.bind(this);
     this.playSong = this.playSong.bind(this);
     this.playNotes = this.playNotes.bind(this);
     this.noteOn = this.noteOn.bind(this);
@@ -57,10 +59,7 @@ class App extends Component {
 
   componentDidMount() {
     this.enableWebMidi();
-    this.loadInstrument('acoustic_grand_piano').then(instrument => {
-      console.log(`${instrument.name} successfully loaded`);
-      this.setInstrument(instrument);
-    });
+    this.loadAndSetInstrument('acoustic_grand_piano');
   }
 
   enableWebMidi() {
@@ -135,7 +134,23 @@ class App extends Component {
     });
   }
 
-  setInstrument(instrument) {
+  deleteInstrumentFromSong(instrumentName) {
+    const { currentSong } = this.state;
+    const instruments = Object.keys(currentSong.notes);
+
+    if (instruments.length <= 1) {
+      console.log("Can't delete last instrument!");
+      return;
+    }
+
+    const { [instrumentName]: deletedNotes, ...newNotes } = currentSong.notes;
+    this.setState({
+      currentSong: Object.assign({}, currentSong, { notes: newNotes })
+    });
+    this.loadAndSetInstrument(instruments[0]);
+  }
+
+  setNewInstrument(instrument) {
     this.setState({
       instrument,
       loadedInstruments: {
@@ -153,6 +168,15 @@ class App extends Component {
     return Soundfont.instrument(new AudioContext(), instrumentName);
   }
 
+  loadAndSetInstrument(instrumentName) {
+    this.loadInstrument(instrumentName)
+      .then(instrument => {
+        console.log('Instrument loaded', instrument.name);
+        this.setNewInstrument(instrument);
+      })
+      .catch(error => console.log('Error loading instrument', instrument));
+  }
+
   changeInstrument(instrumentName) {
     const { loadedInstruments } = this.state;
     if (instrumentName in InstrumentList) {
@@ -162,7 +186,7 @@ class App extends Component {
         });
       } else {
         this.loadInstrument(instrumentName).then(instrument => {
-          this.setInstrument(instrument);
+          this.setNewInstrument(instrument);
           this.addInstrumentToSong(instrumentName);
         });
       }
@@ -273,6 +297,7 @@ class App extends Component {
           song={currentSong}
           playSong={this.playSong}
           toggleRecording={this.toggleRecording}
+          deleteInstrument={this.deleteInstrumentFromSong}
           playNotes={this.playNotes}
         />
         <AddInstrumentButton onClick={this.toggleInstrumentSelector} />

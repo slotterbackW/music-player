@@ -56,9 +56,13 @@ class InstrumentBlocks extends Component {
   }
 
   render() {
+    const { instrument, deleteInstrument } = this.props;
     return (
       <div className="instrument-blocks">
-        <h4>{this.props.instrument}</h4>
+        <div className="header">
+          <h4>{this.props.instrument}</h4>
+          <button onClick={() => deleteInstrument(instrument)}>Delete</button>
+        </div>
         <div className="blocks">{this.renderBlocks()}</div>
       </div>
     );

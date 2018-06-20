@@ -28,7 +28,13 @@ class Song extends Component {
   }
 
   render() {
-    const { song, playNotes, playSong, toggleRecording } = this.props;
+    const {
+      song,
+      playNotes,
+      playSong,
+      toggleRecording,
+      deleteInstrument
+    } = this.props;
     const { activeBlock } = this.state;
 
     return (
@@ -52,6 +58,7 @@ class Song extends Component {
               activeBlock={activeBlock}
               playNotes={playNotesWithInstrument}
               changeActiveBlock={changeBlockWithInstrument.bind(this)}
+              deleteInstrument={deleteInstrument}
             />
           );
         })}
