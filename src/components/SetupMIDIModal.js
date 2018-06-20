@@ -14,7 +14,7 @@ class SetupMIDIModal extends Component {
 
   setupMidiDevice(midiDevice) {
     const { noteOn, noteOff, setMIDIinput } = this.props;
-    console.log('setup MIDI Device', midiDevice);
+    console.log('MIDI Device chosen', midiDevice);
 
     midiDevice.addListener('noteon', 'all', e => {
       noteOn(e);

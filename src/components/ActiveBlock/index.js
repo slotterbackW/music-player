@@ -8,10 +8,11 @@ class ActiveBlock extends Component {
   }
 
   render() {
-    const { notes, index, playNotes } = this.props;
+    const { notes, index, playNotes, stopNotes } = this.props;
     return (
       <div>
         <button onClick={() => playNotes(notes)}>Play Notes</button>
+        <button onClick={() => stopNotes()}>Stop Notes</button>
         <div className="block active-block">
           {notes.map(note => (
             <Note

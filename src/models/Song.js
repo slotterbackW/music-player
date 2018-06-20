@@ -43,5 +43,5 @@ export const notesToBlocks = notes => {
     });
     return blocks;
   }
-  return {};
+  return { 0: [] };
 };

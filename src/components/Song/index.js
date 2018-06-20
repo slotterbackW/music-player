@@ -4,49 +4,29 @@ import SongControls from '../SongControls';
 import styles from './index.css';
 
 class Song extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      activeBlock: {
-        instrument: 'acoustic_grand_piano',
-        index: 0
-      }
-    };
-
-    this.changeActiveBlock = this.changeActiveBlock.bind(this);
-  }
-
-  changeActiveBlock(instrument, index) {
-    console.log('Change active block called', instrument, parseInt(index));
-    this.setState({
-      activeBlock: {
-        instrument,
-        index: parseInt(index)
-      }
-    });
-  }
-
   render() {
     const {
+      activeBlock,
+      changeActiveBlock,
       song,
       playNotes,
       playSong,
+      stopSong,
       toggleRecording,
       deleteInstrument
     } = this.props;
-    const { activeBlock } = this.state;
 
     return (
       <div className="song">
         <SongControls
           title={song.name}
           playSong={playSong}
+          stopSong={stopSong}
           toggleRecording={toggleRecording}
         />
         {Object.keys(song.notes).map(instrument => {
           const changeBlockWithInstrument = blockIndex =>
-            this.changeActiveBlock(instrument, blockIndex);
+            changeActiveBlock(instrument, blockIndex);
 
           const playNotesWithInstrument = notes => playNotes(instrument, notes);
 
@@ -57,6 +37,7 @@ class Song extends Component {
               notes={song.notes[instrument]}
               activeBlock={activeBlock}
               playNotes={playNotesWithInstrument}
+              stopNotes={stopSong}
               changeActiveBlock={changeBlockWithInstrument.bind(this)}
               deleteInstrument={deleteInstrument}
             />

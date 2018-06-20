@@ -21,13 +21,9 @@ class InstrumentBlocks extends Component {
   }
 
   renderBlocks() {
-    const { changeActiveBlock, notes, playNotes } = this.props;
+    const { changeActiveBlock, notes, playNotes, stopNotes } = this.props;
     const blocks = notesToBlocks(notes);
     const blockIndexes = Object.keys(blocks);
-
-    if (blockIndexes.length <= 0) {
-      return <ActiveBlock index={0} notes={[]} />;
-    }
 
     return blockIndexes.map(blockIndex => {
       const blockNotes = blocks[blockIndex];
@@ -38,6 +34,7 @@ class InstrumentBlocks extends Component {
             index={blockIndex}
             notes={blockNotes}
             playNotes={playNotes}
+            stopNotes={stopNotes}
           />
         );
       }
@@ -61,7 +58,12 @@ class InstrumentBlocks extends Component {
       <div className="instrument-blocks">
         <div className="header">
           <h4>{this.props.instrument}</h4>
-          <button onClick={() => deleteInstrument(instrument)}>Delete</button>
+          <button
+            onClick={() => deleteInstrument(instrument)}
+            className="delete"
+          >
+            Delete
+          </button>
         </div>
         <div className="blocks">{this.renderBlocks()}</div>
       </div>

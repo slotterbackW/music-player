@@ -21,6 +21,10 @@ class App extends Component {
     super(props);
 
     this.state = {
+      activeBlock: {
+        instrument: 'acoustic_grand_piano',
+        index: 0
+      },
       showMIDISetupModal: true,
       showKeyboardSetup: false,
       showInstrumentSelector: false,
@@ -37,6 +41,7 @@ class App extends Component {
           acoustic_grand_piano: []
         }
       },
+      playingNotes: [],
       savedSongs: []
     };
 
@@ -46,13 +51,16 @@ class App extends Component {
     this.toggleInstrumentSelector = this.toggleInstrumentSelector.bind(this);
     this.setMIDIinput = this.setMIDIinput.bind(this);
     this.toggleRecording = this.toggleRecording.bind(this);
+    this.changeActiveBlock = this.changeActiveBlock.bind(this);
     this.addInstrumentToSong = this.addInstrumentToSong.bind(this);
     this.deleteInstrumentFromSong = this.deleteInstrumentFromSong.bind(this);
     this.songHasInstrument = this.songHasInstrument.bind(this);
     this.changeInstrument = this.changeInstrument.bind(this);
     this.loadAndSetInstrument = this.loadAndSetInstrument.bind(this);
     this.playSong = this.playSong.bind(this);
+    this.playOnlyNotes = this.playOnlyNotes.bind(this);
     this.playNotes = this.playNotes.bind(this);
+    this.stopPlayingNotes = this.stopPlayingNotes.bind(this);
     this.noteOn = this.noteOn.bind(this);
     this.noteOff = this.noteOff.bind(this);
   }
@@ -118,20 +126,33 @@ class App extends Component {
     });
   }
 
+  changeActiveBlock(instrumentName, index) {
+    this.setState({
+      activeBlock: {
+        instrument: instrumentName,
+        index: parseInt(index)
+      }
+    });
+    this.changeInstrument(instrumentName);
+  }
+
   songHasInstrument(instrumentName) {
     return Object.keys(this.state.currentSong.notes).includes(instrumentName);
   }
 
   addInstrumentToSong(instrumentName) {
     const { currentSong } = this.state;
-    this.setState({
-      currentSong: Object.assign({}, currentSong, {
-        notes: {
-          ...currentSong.notes,
-          [`${instrumentName}`]: []
-        }
-      })
-    });
+    this.setState(
+      {
+        currentSong: Object.assign({}, currentSong, {
+          notes: {
+            ...currentSong.notes,
+            [`${instrumentName}`]: []
+          }
+        })
+      },
+      () => this.changeActiveBlock(instrumentName, 0)
+    );
   }
 
   deleteInstrumentFromSong(instrumentName) {
@@ -195,17 +216,34 @@ class App extends Component {
     }
   }
 
+  playOnlyNotes(instrumentName, notes) {
+    this.setState({
+      playingNotes: this.playNotes(instrumentName, notes)
+    });
+  }
+
   playNotes(instrumentName, notes) {
     const instrument = this.state.loadedInstruments[instrumentName];
     const schedule = notesToSchedule(notes);
-    instrument.schedule(0, schedule);
+    return instrument.schedule(0, schedule);
   }
 
   playSong() {
     const { currentSong } = this.state;
 
-    Object.keys(currentSong.notes).forEach(instrumentName => {
-      this.playNotes(instrumentName, currentSong.notes[instrumentName]);
+    this.setState({
+      playingNotes: Object.keys(currentSong.notes)
+        .map(instrumentName =>
+          this.playNotes(instrumentName, currentSong.notes[instrumentName])
+        )
+        .reduce((acc, item) => acc.concat(item), [])
+    });
+  }
+
+  stopPlayingNotes() {
+    this.state.playingNotes.forEach(note => note.stop());
+    this.setState({
+      playingNotes: []
     });
   }
 
@@ -256,6 +294,7 @@ class App extends Component {
 
   render() {
     const {
+      activeBlock,
       currentSong,
       midiLoading,
       midiError,
@@ -295,10 +334,13 @@ class App extends Component {
         )}
         <Song
           song={currentSong}
+          activeBlock={activeBlock}
           playSong={this.playSong}
+          stopSong={this.stopPlayingNotes}
+          changeActiveBlock={this.changeActiveBlock}
           toggleRecording={this.toggleRecording}
           deleteInstrument={this.deleteInstrumentFromSong}
-          playNotes={this.playNotes}
+          playNotes={this.playOnlyNotes}
         />
         <AddInstrumentButton onClick={this.toggleInstrumentSelector} />
       </div>
