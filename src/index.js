@@ -11,7 +11,7 @@ import SetupKeyboard from './components/SetupKeyboard';
 import InstrumentSelector from './components/InstrumentSelector';
 
 import InstrumentList from './models/Instruments';
-import { notesToSchedule } from './models/Song';
+import { notesToSchedule, BLOCK_LENGTH } from './models/Song';
 import { startNote, completeNote } from './models/TempNotes';
 
 import styles from './index.css';
@@ -33,7 +33,7 @@ class App extends Component {
       midiInput: null,
       instrument: null,
       loadedInstruments: {},
-      time: null,
+      time: Date.now(),
       recording: false,
       currentSong: {
         name: 'Track 1',
@@ -122,7 +122,7 @@ class App extends Component {
     console.log('Recording changed to', !this.state.recording);
     this.setState({
       recording: !this.state.recording,
-      time: new Date()
+      time: Date.now()
     });
   }
 
@@ -257,7 +257,10 @@ class App extends Component {
   */
 
   noteOn(noteEvent) {
-    const timestamp = new Date() - this.state.time;
+    const { activeBlock } = this.state;
+
+    const timestamp =
+      Date.now() + parseInt(activeBlock.index) * BLOCK_LENGTH - this.state.time;
     const nEvent = Object.assign({}, noteEvent, { timestamp });
     console.log('Note on event', nEvent);
     const sound = this.state.instrument.play(noteEvent.note.number);
@@ -265,8 +268,9 @@ class App extends Component {
   }
 
   noteOff(noteEvent) {
-    const { instrument, recording, currentSong } = this.state;
-    const timestamp = new Date() - this.state.time;
+    const { activeBlock, instrument, recording, currentSong } = this.state;
+    const timestamp =
+      Date.now() + parseInt(activeBlock.index) * BLOCK_LENGTH - this.state.time;
     const nEvent = Object.assign({}, noteEvent, { timestamp });
     console.log('Note off event', nEvent);
     const note = completeNote(nEvent);
