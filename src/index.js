@@ -16,15 +16,14 @@ import { startNote, completeNote } from './models/TempNotes';
 
 import styles from './index.css';
 
+export const DEFAULT_INSTRUMENT = 'pad_2_warm';
+
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      activeBlock: {
-        instrument: 'acoustic_grand_piano',
-        index: 0
-      },
+      activeBlockIndex: 0,
       showMIDISetupModal: true,
       showKeyboardSetup: false,
       showInstrumentSelector: false,
@@ -38,7 +37,7 @@ class App extends Component {
       currentSong: {
         name: 'Track 1',
         notes: {
-          acoustic_grand_piano: []
+          [DEFAULT_INSTRUMENT]: []
         }
       },
       playingNotes: [],
@@ -51,7 +50,7 @@ class App extends Component {
     this.toggleInstrumentSelector = this.toggleInstrumentSelector.bind(this);
     this.setMIDIinput = this.setMIDIinput.bind(this);
     this.toggleRecording = this.toggleRecording.bind(this);
-    this.changeActiveBlock = this.changeActiveBlock.bind(this);
+    this.onBlockClick = this.onBlockClick.bind(this);
     this.addInstrumentToSong = this.addInstrumentToSong.bind(this);
     this.deleteInstrumentFromSong = this.deleteInstrumentFromSong.bind(this);
     this.songHasInstrument = this.songHasInstrument.bind(this);
@@ -67,7 +66,7 @@ class App extends Component {
 
   componentDidMount() {
     this.enableWebMidi();
-    this.loadAndSetInstrument('acoustic_grand_piano');
+    this.loadAndSetInstrument(DEFAULT_INSTRUMENT);
   }
 
   enableWebMidi() {
@@ -126,12 +125,9 @@ class App extends Component {
     });
   }
 
-  changeActiveBlock(instrumentName, index) {
+  onBlockClick(instrumentName, index) {
     this.setState({
-      activeBlock: {
-        instrument: instrumentName,
-        index: parseInt(index)
-      }
+      activeBlockIndex: parseInt(index)
     });
     this.changeInstrument(instrumentName);
   }
@@ -151,7 +147,10 @@ class App extends Component {
           }
         })
       },
-      () => this.changeActiveBlock(instrumentName, 0)
+      () =>
+        this.setState({
+          activeBlockIndex: 0
+        })
     );
   }
 
@@ -202,7 +201,7 @@ class App extends Component {
     const { loadedInstruments } = this.state;
     if (instrumentName in InstrumentList) {
       if (this.songHasInstrument(instrumentName)) {
-        this.setState({
+        return this.setState({
           instrument: this.state.loadedInstruments[instrumentName]
         });
       } else {
@@ -257,23 +256,23 @@ class App extends Component {
   */
 
   noteOn(noteEvent) {
-    const { activeBlock } = this.state;
+    const { activeBlockIndex } = this.state;
 
     const timestamp =
-      Date.now() + parseInt(activeBlock.index) * BLOCK_LENGTH - this.state.time;
-    const nEvent = Object.assign({}, noteEvent, { timestamp });
-    console.log('Note on event', nEvent);
+      Date.now() + parseInt(activeBlockIndex) * BLOCK_LENGTH - this.state.time;
+    const noteWithTimestamp = Object.assign({}, noteEvent, { timestamp });
+    console.log('Note on event', noteWithTimestamp);
     const sound = this.state.instrument.play(noteEvent.note.number);
-    startNote(nEvent, sound);
+    startNote(noteWithTimestamp, sound);
   }
 
   noteOff(noteEvent) {
-    const { activeBlock, instrument, recording, currentSong } = this.state;
+    const { activeBlockIndex, instrument, recording, currentSong } = this.state;
     const timestamp =
-      Date.now() + parseInt(activeBlock.index) * BLOCK_LENGTH - this.state.time;
-    const nEvent = Object.assign({}, noteEvent, { timestamp });
-    console.log('Note off event', nEvent);
-    const note = completeNote(nEvent);
+      Date.now() + parseInt(activeBlockIndex) * BLOCK_LENGTH - this.state.time;
+    const noteWithTimestamp = Object.assign({}, noteEvent, { timestamp });
+    console.log('Note off event', noteWithTimestamp);
+    const note = completeNote(noteWithTimestamp);
     if (!note) {
       return;
     }
@@ -298,7 +297,8 @@ class App extends Component {
 
   render() {
     const {
-      activeBlock,
+      activeBlockIndex,
+      instrument,
       currentSong,
       midiLoading,
       midiError,
@@ -306,6 +306,17 @@ class App extends Component {
       showKeyboardSetup,
       showInstrumentSelector
     } = this.state;
+
+    const activeBlock =
+      instrument === null
+        ? {
+            instrument: DEFAULT_INSTRUMENT,
+            index: 0
+          }
+        : {
+            instrument: instrument.name,
+            index: activeBlockIndex
+          };
 
     const error = midiError ? <p>{midiError}</p> : null;
 
@@ -341,7 +352,7 @@ class App extends Component {
           activeBlock={activeBlock}
           playSong={this.playSong}
           stopSong={this.stopPlayingNotes}
-          changeActiveBlock={this.changeActiveBlock}
+          onBlockClick={this.onBlockClick}
           toggleRecording={this.toggleRecording}
           deleteInstrument={this.deleteInstrumentFromSong}
           playNotes={this.playOnlyNotes}

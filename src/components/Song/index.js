@@ -7,7 +7,7 @@ class Song extends Component {
   render() {
     const {
       activeBlock,
-      changeActiveBlock,
+      onBlockClick,
       song,
       playNotes,
       playSong,
@@ -26,7 +26,7 @@ class Song extends Component {
         />
         {Object.keys(song.notes).map(instrument => {
           const changeBlockWithInstrument = blockIndex =>
-            changeActiveBlock(instrument, blockIndex);
+            onBlockClick(instrument, blockIndex);
 
           const playNotesWithInstrument = notes => playNotes(instrument, notes);
 
@@ -38,7 +38,7 @@ class Song extends Component {
               activeBlock={activeBlock}
               playNotes={playNotesWithInstrument}
               stopNotes={stopSong}
-              changeActiveBlock={changeBlockWithInstrument.bind(this)}
+              onBlockClick={changeBlockWithInstrument.bind(this)}
               deleteInstrument={deleteInstrument}
             />
           );

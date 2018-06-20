@@ -21,7 +21,7 @@ class InstrumentBlocks extends Component {
   }
 
   renderBlocks() {
-    const { changeActiveBlock, notes, playNotes, stopNotes } = this.props;
+    const { onBlockClick, notes, playNotes, stopNotes } = this.props;
     const blocks = notesToBlocks(notes);
     const blockIndexes = Object.keys(blocks);
 
@@ -39,14 +39,14 @@ class InstrumentBlocks extends Component {
         );
       }
 
-      const onBlockClick = () => changeActiveBlock(blockIndex);
+      const onClick = () => onBlockClick(blockIndex);
 
       return (
         <Block
           key={blockIndex}
           index={blockIndex}
           notes={blockNotes}
-          onClick={onBlockClick}
+          onClick={onClick}
         />
       );
     });
